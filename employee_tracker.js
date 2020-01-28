@@ -1,8 +1,31 @@
 // Calling inquirer for the terminal based interface
 const inquirer = require("inquirer");
+const mysql = require("mysql");
+
+// create the connection information for the sql database
+var connection = mysql.createConnection({
+    host: "localhost",
+
+    // Your port; if not 3306
+    port: 3306,
+
+    // Your username
+    user: "root",
+
+    // Your password
+    password: "dbpassword",
+    database: "employee_db"
+});
+
+// connect to the mysql server and sql database
+connection.connect(function (err) {
+    if (err) throw err;
+    // run the start function after the connection is made to prompt the user
+    start_prompt();
+});
+
 
 // Initiate terminal based user interface
-
 function start_prompt() {
     inquirer.prompt([
         // Ask user to input username
@@ -43,12 +66,30 @@ function start_prompt() {
             case "Update Employee Roles":
                 update_employee_roles()
                 break;
+            default:
+                break;
         }
     })
 }
 
+function add_departments() {
+    inquirer.prompt([
+        {
+            type: "input",
+            name: "department",
+            message: "Type in the Department name you would like to add?",
+        },
+        // Then Once those choices have been made
+    ]).then(function (data) {
+        // Assign html string to variable from the generateHTML.js file
+        const department = data.department
+        print(department)
 
-function add_employee() {
+    })
+    start_prompt()
+}
+
+function add_employee_prompt() {
     inquirer.prompt([
         {
             type: "input",
@@ -81,7 +122,13 @@ function add_employee() {
     start_prompt()
 }
 
-function add_roles() {
+function add_employee() {
+
+}
+
+
+
+function add_roles_prompt() {
     inquirer.prompt([
         {
             type: "input",
@@ -98,36 +145,44 @@ function add_roles() {
     start_prompt()
 }
 
-function add_departments() {
-    inquirer.prompt([
-        {
-            type: "input",
-            name: "department",
-            message: "Type in the Department name you would like to add?",
-        },
-        // Then Once those choices have been made
-    ]).then(function (data) {
-        // Assign html string to variable from the generateHTML.js file
-        const department = data.department
-        print(department)
+function add_roles() {
 
+}
+
+
+
+function view_all_departments() {
+    // console.log("Selecting all products...\n");
+    connection.query("SELECT * FROM departments", function (err, res) {
+        if (err) throw err;
+        // Log all results of the SELECT statement
+        console.log("\n");
+        console.table(res);
     })
     start_prompt()
 }
 
-function view_all_departments() {
-    start_prompt()
-}
-
 function view_all_roles() {
+    connection.query("SELECT * FROM roles", function (err, res) {
+        if (err) throw err;
+        // Log all results of the SELECT statement
+        console.log("\n");
+        console.table(res);
+    })
     start_prompt()
 }
 
 function view_all_employees() {
+    connection.query("SELECT * FROM employees", function (err, res) {
+        if (err) throw err;
+        // Log all results of the SELECT statement
+        console.log("\n");
+        console.table(res);
+    })
     start_prompt()
 }
 
-function update_employee_roles() {
+function update_employee_roles_prompt() {
     inquirer.prompt([
         {
             type: "input",
@@ -160,12 +215,25 @@ function update_employee_roles() {
     start_prompt()
 }
 
+function update_employee_roles() {
 
-
+}
 
 const print = x => console.log(x)
 
-start_prompt()
+// start_prompt()
+
+
+
+function end_read() {
+    console.log("Selecting all products...\n");
+    connection.query("SELECT * FROM products", function (err, res) {
+        if (err) throw err;
+        // Log all results of the SELECT statement
+        console.log(res);
+        connection.end();
+    });
+}
 
 
     // function start_prompt() {
