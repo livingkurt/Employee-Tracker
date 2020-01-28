@@ -46,13 +46,13 @@ function start_prompt() {
         const navigation = data.navigation
         switch (navigation) {
             case "Add Departments":
-                add_departments();
+                add_departments_prompt();
                 break;
             case "Add Roles":
-                add_roles()
+                add_roles_prompt()
                 break;
             case "Add Employee":
-                add_employee();
+                add_employee_prompt();
                 break;
             case "View All Departments":
                 view_all_departments()
@@ -64,7 +64,7 @@ function start_prompt() {
                 view_all_employees()
                 break;
             case "Update Employee Roles":
-                update_employee_roles()
+                update_employee_roles_prompt()
                 break;
             default:
                 break;
@@ -72,7 +72,7 @@ function start_prompt() {
     })
 }
 
-function add_departments() {
+function add_departments_prompt() {
     inquirer.prompt([
         {
             type: "input",
@@ -84,9 +84,14 @@ function add_departments() {
         // Assign html string to variable from the generateHTML.js file
         const department = data.department
         print(department)
+        add_departments()
 
     })
-    start_prompt()
+    main_menu_prompt()
+}
+
+function add_departments() {
+
 }
 
 function add_employee_prompt() {
@@ -117,9 +122,9 @@ function add_employee_prompt() {
         // Assing user color to variable
         const role = data.role;
         print(role)
-
+        add_employee()
     })
-    start_prompt()
+    main_menu_prompt()
 }
 
 function add_employee() {
@@ -140,9 +145,9 @@ function add_roles_prompt() {
         // Assign html string to variable from the generateHTML.js file
         const role = data.role
         print(role)
-
+        add_roles()
     })
-    start_prompt()
+    main_menu_prompt()
 }
 
 function add_roles() {
@@ -159,7 +164,7 @@ function view_all_departments() {
         console.log("\n");
         console.table(res);
     })
-    start_prompt()
+    main_menu_prompt()
 }
 
 function view_all_roles() {
@@ -169,7 +174,7 @@ function view_all_roles() {
         console.log("\n");
         console.table(res);
     })
-    start_prompt()
+    main_menu_prompt()
 }
 
 function view_all_employees() {
@@ -179,7 +184,7 @@ function view_all_employees() {
         console.log("\n");
         console.table(res);
     })
-    start_prompt()
+    main_menu_prompt()
 }
 
 function update_employee_roles_prompt() {
@@ -210,9 +215,9 @@ function update_employee_roles_prompt() {
         // Assing user color to variable
         const new_role = data.new_role;
         print(new_role)
-
+        update_employee_roles()
     })
-    start_prompt()
+    main_menu_prompt()
 }
 
 function update_employee_roles() {
@@ -221,19 +226,27 @@ function update_employee_roles() {
 
 const print = x => console.log(x)
 
-// start_prompt()
+// main_menu_prompt()
 
-
-
-function end_read() {
-    console.log("Selecting all products...\n");
-    connection.query("SELECT * FROM products", function (err, res) {
-        if (err) throw err;
-        // Log all results of the SELECT statement
-        console.log(res);
-        connection.end();
-    });
+function main_menu_prompt() {
+    inquirer.prompt([
+        {
+            type: "confirm",
+            name: "menu",
+            message: "Back to main menu?",
+        },
+    ]).then(function (data) {
+        const menu = data.menu;
+        print(menu)
+        if (menu){
+            start_prompt()
+        }
+        else {
+            connection.end();
+        }
+    })
 }
+
 
 
     // function start_prompt() {
