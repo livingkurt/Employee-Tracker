@@ -182,7 +182,14 @@ function view_all_roles() {
 }
 
 function view_all_employees() {
-    connection.query("SELECT * FROM employees", function (err, res) {
+    connection.query(`
+        SELECT e.id, e.first_name, e.last_name, roles.title, departments.department, roles.salary, CONCAT(m.first_name ," " ,m.last_name) AS Manager
+        FROM departments
+        RIGHT JOIN roles on roles.department_id = departments.id
+        RIGHT JOIN employees e on e.role_id = roles.id
+        LEFT JOIN employees m ON (m.role_id = e.manager_id)
+        ORDER BY e.id;`, 
+    function (err, res) {
         if (err) throw err;
         // Log all results of the SELECT statement
         console.log("\n");
@@ -242,7 +249,7 @@ function main_menu_prompt() {
     ]).then(function (data) {
         const menu = data.menu;
         print(menu)
-        if (menu){
+        if (menu) {
             start_prompt()
         }
         else {
