@@ -16,6 +16,8 @@ INSERT INTO departments (name)
 VALUES ("Engineering");
 INSERT INTO departments (name)
 VALUES ("Legal");
+INSERT INTO departments (name)
+VALUES ("Finance");
 
 CREATE TABLE roles (
     id INT AUTO_INCREMENT NOT NULL,
@@ -30,16 +32,26 @@ CREATE TABLE roles (
 
 INSERT INTO roles (title, salary, department_id)
 VALUES ("Sales Lead", "100000", 1);
+
 INSERT INTO roles (title, salary, department_id)
-VALUES ("Sales Person", "100000", 1);
+VALUES ("SalesPerson", "80000", 1);
+
 INSERT INTO roles (title, salary, department_id)
-VALUES ("Software Engineer", "100000", 2);
+VALUES ("Lead Engineer", "150000", 2);
+
 INSERT INTO roles (title, salary, department_id)
-VALUES ("Team Lead", "100000", 3);
+VALUES ("Software Engineer", "120000", 2);
+
 INSERT INTO roles (title, salary, department_id)
-VALUES ("Lawyer", "100000", 3);
+VALUES ("Accountant", "125000", 4);
+
 INSERT INTO roles (title, salary, department_id)
-VALUES ("Lead Engineer", "100000", 2);
+VALUES ("Legal Team Lead", "250000", 3);
+
+INSERT INTO roles (title, salary, department_id)
+VALUES ("Lawyer", "190000", 3);
+
+
 
 CREATE TABLE employees (
     id INT  AUTO_INCREMENT ,
@@ -51,14 +63,36 @@ CREATE TABLE employees (
 );
 
 INSERT INTO employees (first_name, last_name, role_id, manager_id)
-VALUES ("Red", "Joe", 4, 1);
-INSERT INTO employees (first_name, last_name, role_id, manager_id)
-VALUES ("Orange", "Brock", 4, 1);
-INSERT INTO employees (first_name, last_name, role_id, manager_id)
-VALUES ("Yellow", "Sam", 4, 1);
-INSERT INTO employees (first_name, last_name, role_id, manager_id)
-VALUES ("Green", "Ungle", 4, 1);
-INSERT INTO employees (first_name, last_name, role_id, manager_id)
-VALUES ("Blue", "Felex", 4, 1);
+VALUES ("Branda", "Mathison", 7, 1);
 
+INSERT INTO employees (first_name, last_name, role_id, manager_id)
+VALUES ("Allena", "Chiu", 1, NULL);
+
+INSERT INTO employees (first_name, last_name, role_id, manager_id)
+VALUES ("Laila", "Wagner", 4, NULL);
+
+INSERT INTO employees (first_name, last_name, role_id, manager_id)
+VALUES ("Alexandra", "Sheth", 6, 1);
+
+INSERT INTO employees (first_name, last_name, role_id, manager_id)
+VALUES ("Elissa", "Covell", 1, 1);
+
+INSERT INTO employees (first_name, last_name, role_id, manager_id)
+VALUES ("Tandra", "Jarrell", 2, NULL);
+
+INSERT INTO employees (first_name, last_name, role_id, manager_id)
+VALUES ("Jay", "Frasier", 3, 1);
+
+INSERT INTO employees (first_name, last_name, role_id, manager_id)
+VALUES ("Veronica", "Lass", 5, 1);
+
+INSERT INTO employees (first_name, last_name, role_id, manager_id)
+VALUES ("Ashton", "Borgia", 3, 1);
+
+INSERT INTO employees (first_name, last_name, role_id, manager_id)
+VALUES ("Jayna", "Lindblad", 4, 1);
+
+-- SELECT employees.first_name, employees.last_name, roles.title, departments.name, roles.salary, employees.manager;
+-- FROM top_albums INNER JOIN top5000 ON (top_albums.artist = top5000.artist AND top_albums.year;
+-- top5000.year) WHERE (top_albums.artist = ? AND top5000.artist = ?) ORDER BY top_albums.year, top_albums.position;
 

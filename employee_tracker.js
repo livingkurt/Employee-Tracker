@@ -91,7 +91,7 @@ function add_departments_prompt() {
 }
 
 function add_departments() {
-
+    
 }
 
 function add_employee_prompt() {
