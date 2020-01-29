@@ -79,7 +79,7 @@ async function start_prompt() {
 
 
 // ---------------------------------------------------------------
-// Adding a new departments
+// Adding a new departments √
 // ---------------------------------------------------------------
 
 
@@ -96,7 +96,6 @@ async function add_departments_prompt() {
         const department = data.department
         print(department)
         add_departments(department)
-
     })
     
 }
@@ -104,15 +103,12 @@ async function add_departments_prompt() {
 async function add_departments(department) {
     await connection.query(`
     INSERT INTO departments (department)
-    VALUES (${department});`,
+    VALUES ("${department}");`,
         await function (err, res) {
             if (err) throw err;
-            // Log all results of the SELECT statement
-            console.log("\n");
-            console.table(res);
         })
     print("\n<<<Updated Departments>>>")
-        // view_all_departments()
+        view_all_departments()
         // main_menu_prompt()
 }
 
@@ -155,36 +151,39 @@ async function add_employee_prompt() {
         },
         // Then Once those choices have been made
     ]).then(async function (data) {
-        // Assign html string to variable from the generateHTML.js file
-        const first_name = data.first_name
-        print(first_name)
-        // Assing username to variable
-        const last_name = data.last_name;
-        print(last_name)
-        // Assing user color to variable
-        const role = data.role;
-        print(role)
-        // Assing user color to variable
-        const manager = data.manager;
-        print(manager)
+        // // Assign html string to variable from the generateHTML.js file
+        // const first_name = data.first_name
+        // print(first_name)
+        // // Assing username to variable
+        // const last_name = data.last_name;
+        // print(last_name)
+        // // Assing user color to variable
+        // const role = data.role;
+        // print(role)
+        // // Assing user color to variable
+        // const manager = data.manager;
+        // print(manager)
+        const first_name = "Jeromy"
+        const last_name = "Back"
+        const role = 4
+        const manager = 1
         await add_employee(first_name, last_name, role, manager)
     })
 }
 
+
 async function add_employee(first_name, last_name, role, manager) {
     await connection.query(`
     INSERT INTO employees (first_name, last_name, role_id, manager_id)
-    VALUES ("Collen", "Rosario", 5, 3);`,
-    // connection.query(`
-    // INSERT INTO employees (first_name, last_name, role_id, manager_id)
-    // VALUES (${first_name}, ${last_name}, ${role}, ${manager});`,
+    VALUES ("${first_name}", "${last_name}", "${role}", $"{manager}");`,
         function (err, res) {
             if (err) throw err;
             // Log all results of the SELECT statement
-            console.log("\n");
-            console.table(res);
+            // console.log("\n");
+            // console.table(res);
+            
         })
-    // view_all_employees()
+    view_all_employees()
     // main_menu_prompt()
 }
 
@@ -212,7 +211,7 @@ function add_roles_prompt() {
             message: "What department is it in?"
         },
         // Then Once those choices have been made
-    ]).then(function (data) {
+    ]).then(async function (data) {
         // Assign html string to variable from the generateHTML.js file
         const role_name = data.role_name
         print(role_name)
@@ -229,14 +228,14 @@ function add_roles_prompt() {
 function add_roles(role_name, salary, department) {
     connection.query(`
     INSERT INTO roles (title, salary, department_id)
-    VALUES (${role_name}, ${salary}, ${department});`,
+    VALUES ("${role_name}", "${salary}", "${department}");`,
         function (err, res) {
             if (err) throw err;
             // Log all results of the SELECT statement
             console.log("\n");
             console.table(res);
         })
-    view_all_departments()
+    view_all_roles()
     // main_menu_prompt()
 }
 
@@ -255,7 +254,7 @@ function view_all_departments() {
         console.log("\n");
         console.table(res);
     })
-    main_menu_prompt()
+    // main_menu_prompt()
 }
 
 
@@ -282,7 +281,7 @@ function view_all_roles() {
         // print(roles)
         
     })
-    main_menu_prompt()
+    // main_menu_prompt()
 }
 
 function get_all_roles() {
@@ -327,7 +326,7 @@ function view_all_employees() {
             console.log("\n");
             console.table(res);
         })
-    main_menu_prompt()
+    // main_menu_prompt()
 }
 
 
