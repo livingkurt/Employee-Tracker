@@ -175,7 +175,7 @@ async function add_employee_prompt() {
 async function add_employee(first_name, last_name, role, manager) {
     await connection.query(`
     INSERT INTO employees (first_name, last_name, role_id, manager_id)
-    VALUES ("${first_name}", "${last_name}", "${role}", $"{manager}");`,
+    VALUES ("${first_name}", "${last_name}", "${role}", "${manager}");`,
         function (err, res) {
             if (err) throw err;
             // Log all results of the SELECT statement
@@ -190,7 +190,7 @@ async function add_employee(first_name, last_name, role, manager) {
 
 
 // ---------------------------------------------------------------
-// Adding a new role
+// Adding a new role √
 // ---------------------------------------------------------------
 
 function add_roles_prompt() {
