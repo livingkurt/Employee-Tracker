@@ -34,7 +34,7 @@ INSERT INTO roles (title, salary, department_id)
 VALUES ("Sales Lead", "100000", 1);
 
 INSERT INTO roles (title, salary, department_id)
-VALUES ("SalesPerson", "80000", 1);
+VALUES ("Salesperson", "80000", 1);
 
 INSERT INTO roles (title, salary, department_id)
 VALUES ("Lead Engineer", "150000", 2);
@@ -51,6 +51,11 @@ VALUES ("Legal Team Lead", "250000", 3);
 INSERT INTO roles (title, salary, department_id)
 VALUES ("Lawyer", "190000", 3);
 
+INSERT INTO roles (title, salary, department_id)
+VALUES ("Financial Team Lead", "300000", 4);
+
+
+
 
 
 CREATE TABLE employees (
@@ -63,34 +68,34 @@ CREATE TABLE employees (
 );
 
 INSERT INTO employees (first_name, last_name, role_id, manager_id)
-VALUES ("Branda", "Mathison", 7, 1);
+VALUES ("Branda", "Mathison", 7, 6);
 
 INSERT INTO employees (first_name, last_name, role_id, manager_id)
 VALUES ("Allena", "Chiu", 1, NULL);
 
 INSERT INTO employees (first_name, last_name, role_id, manager_id)
-VALUES ("Laila", "Wagner", 4, NULL);
+VALUES ("Laila", "Wagner", 6, NULL);
 
 INSERT INTO employees (first_name, last_name, role_id, manager_id)
-VALUES ("Alexandra", "Sheth", 6, 1);
+VALUES ("Alexandra", "Sheth", 4, 3);
 
 INSERT INTO employees (first_name, last_name, role_id, manager_id)
-VALUES ("Elissa", "Covell", 1, 1);
+VALUES ("Elissa", "Covell", 5, 8);
 
 INSERT INTO employees (first_name, last_name, role_id, manager_id)
-VALUES ("Tandra", "Jarrell", 2, NULL);
+VALUES ("Tandra", "Jarrell", 8, NULL);
 
 INSERT INTO employees (first_name, last_name, role_id, manager_id)
-VALUES ("Jay", "Frasier", 3, 1);
+VALUES ("Jay", "Frasier", 3, NULL);
 
 INSERT INTO employees (first_name, last_name, role_id, manager_id)
-VALUES ("Veronica", "Lass", 5, 1);
+VALUES ("Veronica", "Lass", 5, 8);
 
 INSERT INTO employees (first_name, last_name, role_id, manager_id)
-VALUES ("Ashton", "Borgia", 3, 1);
+VALUES ("Ashton", "Borgia", 2, 1);
 
 INSERT INTO employees (first_name, last_name, role_id, manager_id)
-VALUES ("Jayna", "Lindblad", 4, 1);
+VALUES ("Jayna", "Lindblad", 4, 3);
 
 -- SELECT employees.first_name, employees.last_name, roles.title, departments.name, roles.salary, employees.manager;
 -- FROM top_albums INNER JOIN top5000 ON (top_albums.artist = top5000.artist AND top_albums.year;

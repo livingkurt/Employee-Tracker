@@ -91,7 +91,7 @@ function add_departments_prompt() {
 }
 
 function add_departments() {
-    
+
 }
 
 function add_employee_prompt() {
@@ -136,9 +136,13 @@ function add_employee() {
 function add_roles_prompt() {
     inquirer.prompt([
         {
-            type: "input",
+            type: "raw_input",
             name: "role",
-            message: "Type in the role name would you like to add?",
+            choices: [
+                "Team Lead",
+                "CEO",
+                "CFO",
+                "Janitor"]
         },
         // Then Once those choices have been made
     ]).then(function (data) {
