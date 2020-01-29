@@ -107,9 +107,18 @@ function add_employee_prompt() {
             message: "What is your employees last name?"
         },
         {
-            type: "input",
-            name: "role",
-            message: "What is your employees role?"
+            type: "rawlist",
+            name: "new_role",
+            message: "What employees role would you like to change the employee to?",
+            choices: [
+                "Lead Sales",
+                "Lead Engineer",
+                "Lead Lawyer",
+                "Lead Accountant",
+                "Sales Representative",
+                "Software Engineer",
+                "Lawyer",
+                "Accountant"]
         },
         // Then Once those choices have been made
     ]).then(function (data) {
@@ -136,26 +145,47 @@ function add_employee() {
 function add_roles_prompt() {
     inquirer.prompt([
         {
-            type: "raw_input",
-            name: "role",
-            choices: [
-                "Team Lead",
-                "CEO",
-                "CFO",
-                "Janitor"]
+            type: "input",
+            name: "role_name",
+            message: "What is the role called?"
+        },
+        {
+            type: "input",
+            name: "salary",
+            message: "What is the base salary?"
+        },
+        {
+            type: "input",
+            name: "department",
+            message: "What department is it in?"
         },
         // Then Once those choices have been made
     ]).then(function (data) {
         // Assign html string to variable from the generateHTML.js file
-        const role = data.role
-        print(role)
-        add_roles()
+        const role_name = data.role_name
+        print(role_name)
+        // Assing username to variable
+        const salary = data.salary;
+        print(salary)
+        // Assing user color to variable
+        const department = data.department;
+        print(department)
+        add_roles(role_name, salary, department)
     })
-    main_menu_prompt()
 }
 
-function add_roles() {
-
+function add_roles(role_name, salary, department) {
+    connection.query(`
+    INSERT INTO roles (title, salary, department_id)
+    VALUES (${role_name}, ${salary}, ${department});`,
+        function (err, res) {
+            if (err) throw err;
+            // Log all results of the SELECT statement
+            console.log("\n");
+            console.table(res);
+        })
+    view_all_departments()
+    main_menu_prompt()
 }
 
 
@@ -188,32 +218,50 @@ function view_all_employees() {
         RIGHT JOIN roles on roles.department_id = departments.id
         RIGHT JOIN employees e on e.role_id = roles.id
         LEFT JOIN employees m ON (m.role_id = e.manager_id)
-        ORDER BY e.id;`, 
-    function (err, res) {
-        if (err) throw err;
-        // Log all results of the SELECT statement
-        console.log("\n");
-        console.table(res);
-    })
+        ORDER BY e.id;`,
+        function (err, res) {
+            if (err) throw err;
+            // Log all results of the SELECT statement
+            console.log("\n");
+            console.table(res);
+        })
     main_menu_prompt()
 }
 
 function update_employee_roles_prompt() {
+    // connection.query(`
+    //     SELECT CONCAT(first_name ," " ,last_name)
+    //     FROM employees;`,
+    //     function (err, res) {
+    //         if (err) throw err;
+    //         // Log all results of the SELECT statement
+    //         console.log("\n");
+    //         console.log(res.keys)
+    //     })
     inquirer.prompt([
         {
-            type: "input",
-            name: "first_name",
-            message: "What is your employees first name?",
-        },
-        {
-            type: "input",
-            name: "last_name",
-            message: "What is your employees last name?"
-        },
-        {
-            type: "input",
+            type: "rawlist",
             name: "new_role",
-            message: "What employees role would you like to change the employee to?"
+            message: "Which employee do you want to update?",
+            choices: [
+                "Person_1",
+                "Person_2",
+
+            ]
+        },
+        {
+            type: "rawlist",
+            name: "new_role",
+            message: "What employees role would you like to change the employee to?",
+            choices: [
+                "Lead Sales",
+                "Lead Engineer",
+                "Lead Lawyer",
+                "Lead Accountant",
+                "Sales Representative",
+                "Software Engineer",
+                "Lawyer",
+                "Accountant"]
         },
         // Then Once those choices have been made
     ]).then(function (data) {
@@ -226,13 +274,23 @@ function update_employee_roles_prompt() {
         // Assing user color to variable
         const new_role = data.new_role;
         print(new_role)
-        update_employee_roles()
+        // update_employee_roles()
     })
     main_menu_prompt()
 }
 
 function update_employee_roles() {
-
+    connection.query(`
+        UPDATE employees
+        SET role_id = ?, manager_id = ?
+        WHERE id = 10;`,
+        function (err, res) {
+            if (err) throw err;
+            // Log all results of the SELECT statement
+            console.log("\n");
+            console.table(res);
+        })
+    main_menu_prompt()
 }
 
 const print = x => console.log(x)
