@@ -115,11 +115,14 @@ async function add_departments(department) {
 
 
 // ---------------------------------------------------------------
-// Adding a new employee
+// Adding a new employee √
 // ---------------------------------------------------------------
 
-async function add_employee_prompt() {
-    await inquirer.prompt([
+function add_employee_prompt() {
+    connection.query(`SELECT * FROM roles`,function (err, res) {
+        if (err) throw err;
+        
+    inquirer.prompt([
         {
             type: "input",
             name: "first_name",
@@ -134,15 +137,34 @@ async function add_employee_prompt() {
             type: "rawlist",
             name: "new_role",
             message: "What employees role would you like to change the employee to?",
-            choices: [
-                "Lead Sales",
-                "Lead Engineer",
-                "Lead Lawyer",
-                "Lead Accountant",
-                "Sales Representative",
-                "Software Engineer",
-                "Lawyer",
-                "Accountant"]
+            choices: function () {
+                var roles = [];
+                for (var i = 0; i < res.length; i++) {
+                    roles.push(res[i].title)
+                }
+                return roles;
+            }
+                //     // Log all results of the SELECT statement
+                //     // console.log("\n");
+                //     // console.table(res);
+                //     // const values=Object.values(res);
+                //     // const roles = []
+                //     const roles = map(res => res.title)
+                //     // print(values[0].title)
+                //     print(roles)
+                //     return roles
+                //     const values=Object.values(res);
+                //     const roles = []
+                //     // print(values[0].title)
+                //     for (let i = 0; i < values.length; i++){
+                //         // print(values[i].title)
+                //         let role = values[i].title
+                //         roles.push(role)
+                //         // print(roles)
+                //     }
+                //     print(roles)
+                // }
+        
         },
         {
             type: "input",
@@ -150,7 +172,8 @@ async function add_employee_prompt() {
             message: "What is the employees manager?"
         },
         // Then Once those choices have been made
-    ]).then(async function (data) {
+    
+    ]).then(function (data) {
         // // Assign html string to variable from the generateHTML.js file
         // const first_name = data.first_name
         // print(first_name)
@@ -167,8 +190,9 @@ async function add_employee_prompt() {
         const last_name = "Back"
         const role = 4
         const manager = 1
-        await add_employee(first_name, last_name, role, manager)
+        add_employee(first_name, last_name, role, manager)
     })
+})
 }
 
 
@@ -178,10 +202,6 @@ async function add_employee(first_name, last_name, role, manager) {
     VALUES ("${first_name}", "${last_name}", "${role}", "${manager}");`,
         function (err, res) {
             if (err) throw err;
-            // Log all results of the SELECT statement
-            // console.log("\n");
-            // console.table(res);
-            
         })
     view_all_employees()
     // main_menu_prompt()
@@ -269,17 +289,6 @@ function view_all_roles() {
         // Log all results of the SELECT statement
         console.log("\n");
         console.table(res);
-        // const values=Object.values(res);
-        // const roles = []
-        // print(values[0].title)
-        // for (let i = 0; i < values.length; i++){
-        //     // print(values[i].title)
-        //     let role = values[i].title
-        //     roles.push(role)
-        //     // print(roles)
-        // }
-        // print(roles)
-        
     })
     // main_menu_prompt()
 }
@@ -291,20 +300,50 @@ function get_all_roles() {
         console.log("\n");
         // console.table(res);
         const values=Object.values(res);
-        const roles = []
+        // const roles = []
+        const roles = map(values => values.title)
         // print(values[0].title)
-        for (let i = 0; i < values.length; i++){
-            // print(values[i].title)
-            let role = values[i].title
-            roles.push(role)
-            // print(roles)
-        }
         print(roles)
-        return roles
+        
+        // for (let i = 0; i < values.length; i++){
+        //     // print(values[i].title)
+        //     let role = values[i].title
+        //     roles.push(role)
+        //     // print(roles)
+        // }
+        // print(roles)
+        // return roles
         
     })
     // main_menu_prompt()
 }
+
+
+// function get_all_roles() {
+//     return new Promise((resolve, reject) => {
+//         connection.query("SELECT * FROM roles", function (err, res) {
+//             if (err){
+//                 return reject(err)
+//             };
+//             // Log all results of the SELECT statement
+//             console.log("\n");
+//             // console.table(res);
+//             const values=Object.values(res);
+//             const roles = []
+//             // print(values[0].title)
+//             for (let i = 0; i < values.length; i++){
+//                 // print(values[i].title)
+//                 let role = values[i].title
+//                 roles.push(role)
+//                 // print(roles)
+//             }
+//             print(roles)
+//             resolve(roles);
+            
+//         })
+//     })
+//     // main_menu_prompt()
+// }
 
 
 // ---------------------------------------------------------------
