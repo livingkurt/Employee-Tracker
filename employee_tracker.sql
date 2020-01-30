@@ -122,3 +122,15 @@ RIGHT JOIN employees e on e.role_id = roles.id
 LEFT JOIN employees m ON (m.role_id = e.manager_id)
 ORDER BY e.id;
 
+
+
+SELECT CONCAT(t1.first_name ," " ,t1.last_name), t2.title
+FROM (
+   SELECT first_name, last_name,
+          ROW_NUMBER() OVER (ORDER BY first_name) AS rn
+   FROM employees) AS t1
+LEFT JOIN  (
+   SELECT title,
+          ROW_NUMBER() OVER (ORDER BY title) AS rn
+   FROM roles) AS t2
+ON t1.rn = t2.rn

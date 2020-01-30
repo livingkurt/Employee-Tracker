@@ -320,7 +320,7 @@ async function add_employee(first_name, last_name, role, manager) {
 
 
 // ---------------------------------------------------------------
-// Viewing all Departments
+// Viewing all Departments 
 // ---------------------------------------------------------------
 
 
@@ -442,70 +442,152 @@ function update_employee_roles_prompt() {
     //         console.log(res.keys)
     //     })
     connection.query(`
-    SELECT CONCAT(employees.first_name ," " ,employees.last_name) AS name, roles.title
-    FROM employees
-    INNER JOIN roles; 
-    `, function (err, res) {
+    SELECT t1.id, CONCAT(t1.first_name ," " ,t1.last_name) AS full_name, t1.manager_id,  t2.title, t2.id AS role_id
+    FROM (
+    SELECT id, first_name, last_name, manager_id,
+            ROW_NUMBER() OVER (ORDER BY first_name) AS rn
+    FROM employees) AS t1
+    LEFT JOIN  (
+    SELECT id, title,
+            ROW_NUMBER() OVER (ORDER BY id) AS rn
+    FROM roles) AS t2
+    ON t1.rn = t2.rn`, function (err, res) {
         if (err) throw err;
         inquirer.prompt([
             {
                 type: "rawlist",
-                name: "new_role",
+                name: "name",
                 message: "Which employee do you want to update?",
                 choices: function () {
-                    var employees = [];
+                    var employee_name = [];
                     for (var i = 0; i < res.length; i++) {
-                        // let name = res[i].first_name + " " + res[i].last_name
-                        print(res[i].name)
-                        // employees.push(name)
-                        employees.push(res[i].name)
+                        // print(res[i].title)
+                        let name = res[i].full_name
+                        if (name !== null) {
+                            let name = res[i].full_name
+                            employee_name.push(name)
+                        }
                     }
-                    return employees;
+                    return employee_name;
                 }
             },
             {
                 type: "rawlist",
                 name: "new_role",
-                message: "What employees role would you like to change the employee to?",
+                message: "What employee role would you like to change the employee to?",
                 choices: function () {
                     var roles = [];
                     for (var i = 0; i < res.length; i++) {
-                        roles.push(res[i].title)
+                        // print(res[i].title)
+                        let role = res[i].title
+                        if (role !== null) {
+                            roles.push(role)
+                        }
+
                     }
                     return roles;
+                }
+            },
+            {
+                type: "rawlist",
+                name: "manager",
+                message: "Choose Manager for employee to be under?",
+                choices: function () {
+                    var managers = [];
+                    for (var i = 0; i < res.length; i++) {
+                        // print(res[i].full_name)
+                        let name = res[i].full_name
+                        let id = res[i].manager_id
+                        if (id === null) {
+                            managers.push(name)
+                        }
+                    }
+                    return managers;
                 }
             },
             // Then Once those choices have been made
         ]).then(function (data) {
             // Assign html string to variable from the generateHTML.js file
-            const first_name = data.first_name
-            print(first_name)
-            // Assing username to variable
-            const last_name = data.last_name;
-            print(last_name)
+            const name = data.name
+            print(name)
             // Assing user color to variable
             const new_role = data.new_role;
             print(new_role)
-            // update_employee_roles()
+
+            // Assing user color to variable
+            const manager = data.manager;
+            print(manager)
+
+            let id = 0;
+            for (var i = 1; i < res.length; i++) {
+                let name = res[i].full_name
+                if (name === res[i].full_name) {
+                    // print(res[i].full_name)
+                    id = res[i].id
+                    
+                }
+                
+            }
+            print(id)
+            const new_id = parseInt(id)
+
+            let role_id = 0;
+            for (var i = 1; i < res.length; i++) {
+                // print(res[i].title)
+                if (new_role === res[i].title) {
+                    role_id = res[i].id
+                }
+            }
+            print(role_id)
+            const new_role_id = parseInt(role_id)
+            
+            let manager_id = 0;
+            for (var i = 1; i < res.length; i++) {
+                // print(res[i].full_name)
+                if (manager === res[i].full_name) {
+                    manager_id = res[i].id
+                }
+            }
+            print(manager_id)
+            const new_manager_id = parseInt(manager_id)
+
+            connection.query(`
+            UPDATE employees
+            SET role_id = ${new_id}, manager_id = ${new_role_id}
+            WHERE id = ${manager_id};`,
+                function (err, res) {
+                    // print(id)
+                    // print(role_id)
+                    // print(manager_id)
+                    if (err) throw err;
+                    // Log all results of the SELECT statement
+                    console.log("\n");
+                    // console.table(res);
+                    view_all_employees()
+                })
+                
+                // update_employee_roles()
+
+
         })
         // main_menu_prompt()
 
     })
 }
 
-function update_employee_roles() {
-    connection.query(`
-        UPDATE employees
-        SET role_id = ?, manager_id = ?
-        WHERE id = 10;`,
-        function (err, res) {
-            if (err) throw err;
-            // Log all results of the SELECT statement
-            console.log("\n");
-            console.table(res);
-        })
-    main_menu_prompt()
-}
+// function update_employee_roles() {
+//     connection.query(`
+//         UPDATE employees
+//         SET role_id = ?, manager_id = ?
+//         WHERE id = 10;`,
+//         function (err, res) {
+//             if (err) throw err;
+//             // Log all results of the SELECT statement
+//             console.log("\n");
+//             console.table(res);
+//         })
+//     main_menu_prompt()
+// }
 
 const print = x => console.log(x)
 
