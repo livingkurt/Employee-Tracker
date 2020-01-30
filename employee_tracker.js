@@ -163,18 +163,6 @@ function add_roles_prompt() {
                 // Calls an anoynomous function to add the department name column to an array to be used as choices
                 choices: function () {
                     return res.map(depart => depart.department)
-                    // print(res.map(depart => depart.department))
-
-                    // // Creates empty array
-                    // var depart = [];
-                    // // Loops through response from database 
-                    // for (var i = 0; i < res.length; i++) {
-                    //     // Adds each department name to an array
-                    //     depart.push(res[i].department)
-                    //     // print(depart)
-                    // }
-                    // Returns array to be used as an autopopulating list of multiple choices for the question
-                    // return depart;
                 }
             },
             // Then Once those choices have been made
@@ -260,6 +248,7 @@ function add_employee_prompt() {
                 message: "What employees role would you like to change the employee to?",
                 // Calls an anoynomous function to add the department name column to an array to be used as choices
                 choices: function () {
+                    return res.map(role => role.title)
                     // Creates empty array
                     var roles = [];
                     // Loops through response from database 
