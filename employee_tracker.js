@@ -83,19 +83,20 @@ async function start_prompt() {
 // ---------------------------------------------------------------
 
 
-async function add_departments_prompt() {
-    await inquirer.prompt([
+function add_departments_prompt() {
+    inquirer.prompt([
         {
             type: "input",
             name: "department",
             message: "Type in the Department name you would like to add?",
         },
         // Then Once those choices have been made
-    ]).then(function (data) {
+    ]).then(async function (data) {
         // Assign html string to variable from the generateHTML.js file
         const department = data.department
         print(department)
-        add_departments(department)
+        await add_departments(department)
+        // await main_menu_prompt()
     })
     
 }
@@ -112,136 +113,61 @@ async function add_departments(department) {
         // main_menu_prompt()
 }
 
-
-
-// ---------------------------------------------------------------
-// Adding a new employee √
-// ---------------------------------------------------------------
-
-function add_employee_prompt() {
-    connection.query(`SELECT * FROM roles`,function (err, res) {
-        if (err) throw err;
-        
-    inquirer.prompt([
-        {
-            type: "input",
-            name: "first_name",
-            message: "What is your employees first name?",
-        },
-        {
-            type: "input",
-            name: "last_name",
-            message: "What is your employees last name?"
-        },
-        {
-            type: "rawlist",
-            name: "new_role",
-            message: "What employees role would you like to change the employee to?",
-            choices: function () {
-                var roles = [];
-                for (var i = 0; i < res.length; i++) {
-                    roles.push(res[i].title)
-                }
-                return roles;
-            }
-                //     // Log all results of the SELECT statement
-                //     // console.log("\n");
-                //     // console.table(res);
-                //     // const values=Object.values(res);
-                //     // const roles = []
-                //     const roles = map(res => res.title)
-                //     // print(values[0].title)
-                //     print(roles)
-                //     return roles
-                //     const values=Object.values(res);
-                //     const roles = []
-                //     // print(values[0].title)
-                //     for (let i = 0; i < values.length; i++){
-                //         // print(values[i].title)
-                //         let role = values[i].title
-                //         roles.push(role)
-                //         // print(roles)
-                //     }
-                //     print(roles)
-                // }
-        
-        },
-        {
-            type: "input",
-            name: "manager",
-            message: "What is the employees manager?"
-        },
-        // Then Once those choices have been made
-    
-    ]).then(function (data) {
-        // // Assign html string to variable from the generateHTML.js file
-        // const first_name = data.first_name
-        // print(first_name)
-        // // Assing username to variable
-        // const last_name = data.last_name;
-        // print(last_name)
-        // // Assing user color to variable
-        // const role = data.role;
-        // print(role)
-        // // Assing user color to variable
-        // const manager = data.manager;
-        // print(manager)
-        const first_name = "Jeromy"
-        const last_name = "Back"
-        const role = 4
-        const manager = 1
-        add_employee(first_name, last_name, role, manager)
-    })
-})
-}
-
-
-async function add_employee(first_name, last_name, role, manager) {
-    await connection.query(`
-    INSERT INTO employees (first_name, last_name, role_id, manager_id)
-    VALUES ("${first_name}", "${last_name}", "${role}", "${manager}");`,
-        function (err, res) {
-            if (err) throw err;
-        })
-    view_all_employees()
-    // main_menu_prompt()
-}
-
-
-
 // ---------------------------------------------------------------
 // Adding a new role √
 // ---------------------------------------------------------------
 
 function add_roles_prompt() {
-    inquirer.prompt([
-        {
-            type: "input",
-            name: "role_name",
-            message: "What is the role called?"
-        },
-        {
-            type: "input",
-            name: "salary",
-            message: "What is the base salary?"
-        },
-        {
-            type: "input",
-            name: "department",
-            message: "What department is it in?"
-        },
-        // Then Once those choices have been made
-    ]).then(async function (data) {
-        // Assign html string to variable from the generateHTML.js file
-        const role_name = data.role_name
-        print(role_name)
-        // Assing username to variable
-        const salary = data.salary;
-        print(salary)
-        // Assing user color to variable
-        const department = data.department;
-        print(department)
-        add_roles(role_name, salary, department)
+    connection.query(`SELECT * FROM departments`,function (err, res) {
+        if (err) throw err;
+
+        inquirer.prompt([
+            {
+                type: "input",
+                name: "role_name",
+                message: "What is the role called?"
+            },
+            {
+                type: "input",
+                name: "salary",
+                message: "What is the base salary?"
+            },
+            {
+                type: "rawlist",
+                name: "department",
+                message: "What department is it in?",
+                choices: function () {
+                    var depart = [];
+                    for (var i = 0; i < res.length; i++) {
+                        depart.push(res[i].department)
+                        // print(depart)
+                    }
+                    return depart;
+                }
+            },
+            // Then Once those choices have been made
+        ]).then(function (data) {
+            // Assign html string to variable from the generateHTML.js file
+            const role_name = data.role_name
+            print(role_name)
+            // Assing username to variable
+            const salary = data.salary;
+            print(salary)
+            // Assing user color to variable
+            const department = data.department;
+            print(department)
+            let department_id = 0;
+            connection.query(`SELECT * FROM departments`,function (err, res) {
+                if (err) throw err;
+                for (var i = 0; i < res.length; i++) {
+                    if (department === res[i].department) {
+                        department_id = res[i].id
+                    }
+                }
+                add_roles(role_name, salary, department_id)
+            
+            })
+        })
     })
 }
 
@@ -260,6 +186,80 @@ function add_roles(role_name, salary, department) {
 }
 
 
+// ---------------------------------------------------------------
+// Adding a new employee √
+// ---------------------------------------------------------------
+
+function add_employee_prompt() {
+    connection.query(`SELECT * FROM roles`,function (err, res) {
+        if (err) throw err;
+        
+        inquirer.prompt([
+            {
+                type: "input",
+                name: "first_name",
+                message: "What is your employees first name?",
+            },
+            {
+                type: "input",
+                name: "last_name",
+                message: "What is your employees last name?"
+            },
+            {
+                type: "rawlist",
+                name: "new_role",
+                message: "What employees role would you like to change the employee to?",
+                choices: function () {
+                    var roles = [];
+                    for (var i = 0; i < res.length; i++) {
+                        roles.push(res[i].title)
+                    }
+                    return roles;
+                }
+            },
+            {
+                type: "input",
+                name: "manager",
+                message: "What is the employees manager?"
+            },
+            // Then Once those choices have been made
+        
+        ]).then(function (data) {
+            // // Assign html string to variable from the generateHTML.js file
+            // const first_name = data.first_name
+            // print(first_name)
+            // // Assing username to variable
+            // const last_name = data.last_name;
+            // print(last_name)
+            // // Assing user color to variable
+            // const role = data.role;
+            // print(role)
+            // // Assing user color to variable
+            // const manager = data.manager;
+            // print(manager)
+            const first_name = "Jeromy"
+            const last_name = "Back"
+            const role = 4
+            const manager = 1
+            add_employee(first_name, last_name, role, manager)
+        })
+    })
+}
+
+
+async function add_employee(first_name, last_name, role, manager) {
+    await connection.query(`
+    INSERT INTO employees (first_name, last_name, role_id, manager_id)
+    VALUES ("${first_name}", "${last_name}", "${role}", "${manager}");`,
+        function (err, res) {
+            if (err) throw err;
+        })
+    view_all_employees()
+    // main_menu_prompt()
+}
+
+
+
 
 // ---------------------------------------------------------------
 // Viewing all Departments
@@ -274,7 +274,7 @@ function view_all_departments() {
         console.log("\n");
         console.table(res);
     })
-    // main_menu_prompt()
+    main_menu_prompt()
 }
 
 
@@ -383,45 +383,56 @@ function update_employee_roles_prompt() {
     //         console.log("\n");
     //         console.log(res.keys)
     //     })
-    inquirer.prompt([
-        {
-            type: "rawlist",
-            name: "new_role",
-            message: "Which employee do you want to update?",
-            choices: [
-                "Person_1",
-                "Person_2",
+    connection.query(`
+    SELECT CONCAT(employees.first_name ," " ,employees.last_name) AS name, roles.title
+    FROM employees
+    INNER JOIN roles; 
+    `,function (err, res) {
+        if (err) throw err;
+        inquirer.prompt([
+            {
+                type: "rawlist",
+                name: "new_role",
+                message: "Which employee do you want to update?",
+                choices: function () {
+                    var employees = [];
+                    for (var i = 0; i < res.length; i++) {
+                        // let name = res[i].first_name + " " + res[i].last_name
+                        print(res[i].name)
+                        // employees.push(name)
+                        employees.push(res[i].name)
+                    }
+                    return employees;
+                }
+            },
+            {
+                type: "rawlist",
+                name: "new_role",
+                message: "What employees role would you like to change the employee to?",
+                choices: function () {
+                    var roles = [];
+                    for (var i = 0; i < res.length; i++) {
+                        roles.push(res[i].title)
+                    }
+                    return roles;
+                }
+            },
+            // Then Once those choices have been made
+        ]).then(function (data) {
+            // Assign html string to variable from the generateHTML.js file
+            const first_name = data.first_name
+            print(first_name)
+            // Assing username to variable
+            const last_name = data.last_name;
+            print(last_name)
+            // Assing user color to variable
+            const new_role = data.new_role;
+            print(new_role)
+            // update_employee_roles()
+        })
+        // main_menu_prompt()
 
-            ]
-        },
-        {
-            type: "rawlist",
-            name: "new_role",
-            message: "What employees role would you like to change the employee to?",
-            choices: [
-                "Lead Sales",
-                "Lead Engineer",
-                "Lead Lawyer",
-                "Lead Accountant",
-                "Sales Representative",
-                "Software Engineer",
-                "Lawyer",
-                "Accountant"]
-        },
-        // Then Once those choices have been made
-    ]).then(function (data) {
-        // Assign html string to variable from the generateHTML.js file
-        const first_name = data.first_name
-        print(first_name)
-        // Assing username to variable
-        const last_name = data.last_name;
-        print(last_name)
-        // Assing user color to variable
-        const new_role = data.new_role;
-        print(new_role)
-        // update_employee_roles()
     })
-    main_menu_prompt()
 }
 
 function update_employee_roles() {
