@@ -45,7 +45,8 @@ async function start_prompt() {
                 "View All Departments",
                 "View All Roles",
                 "View All Employees",
-                "Update Employee Roles"]
+                "Update Employee Roles",
+                "Exit"]
         },
     ]).then(function (data) {
         const navigation = data.navigation
@@ -71,6 +72,11 @@ async function start_prompt() {
             case "Update Employee Roles":
                 update_employee_roles_prompt()
                 break;
+            case "Exit":
+                // update_employee_roles_prompt()
+                print("\n<<<Exiting Database\n")
+                break;
+
             default:
                 break;
         }
@@ -102,14 +108,15 @@ function add_departments_prompt() {
 }
 
 async function add_departments(department) {
-    await connection.query(`
+    connection.query(`
     INSERT INTO departments (department)
     VALUES ("${department}");`,
         await function (err, res) {
             if (err) throw err;
+            view_all_departments()
         })
     print("\n<<<Updated Departments>>>")
-    view_all_departments()
+
     // main_menu_prompt()
 }
 
@@ -288,16 +295,6 @@ function add_employee_prompt() {
                 }
             }
             add_employee(first_name, last_name, role_id, manager_id)
-            // connection.query(`SELECT * FROM roles`, function (err, res) {
-            //     if (err) throw err;
-            //     for (var i = 1; i < res.length; i++) {
-            //         print(res[i].title)
-            //         if (role === res[i].title) {
-            //             role_id = res[i].id
-            //         }
-            //     }
-            //     add_employee(first_name, last_name, role_id, null)
-            // })
 
 
         })
@@ -324,15 +321,16 @@ async function add_employee(first_name, last_name, role, manager) {
 // ---------------------------------------------------------------
 
 
-function view_all_departments() {
+async function view_all_departments() {
     // console.log("Selecting all products...\n");
-    connection.query("SELECT * FROM departments", function (err, res) {
+    await connection.query("SELECT * FROM departments", async function (err, res) {
         if (err) throw err;
         // Log all results of the SELECT statement
         console.log("\n");
-        console.table(res);
+        await console.table(res);
     })
-    main_menu_prompt()
+    // main_menu_prompt()
+    await start_prompt()
 }
 
 
@@ -349,6 +347,7 @@ function view_all_roles() {
         console.table(res);
     })
     // main_menu_prompt()
+    start_prompt()
 }
 
 function get_all_roles() {
@@ -373,35 +372,9 @@ function get_all_roles() {
         // return roles
 
     })
+    start_prompt()
     // main_menu_prompt()
 }
-
-
-// function get_all_roles() {
-//     return new Promise((resolve, reject) => {
-//         connection.query("SELECT * FROM roles", function (err, res) {
-//             if (err){
-//                 return reject(err)
-//             };
-//             // Log all results of the SELECT statement
-//             console.log("\n");
-//             // console.table(res);
-//             const values=Object.values(res);
-//             const roles = []
-//             // print(values[0].title)
-//             for (let i = 0; i < values.length; i++){
-//                 // print(values[i].title)
-//                 let role = values[i].title
-//                 roles.push(role)
-//                 // print(roles)
-//             }
-//             print(roles)
-//             resolve(roles);
-
-//         })
-//     })
-//     // main_menu_prompt()
-// }
 
 
 // ---------------------------------------------------------------
@@ -423,6 +396,7 @@ function view_all_employees() {
             console.log("\n");
             console.table(res);
         })
+        start_prompt()
     // main_menu_prompt()
 }
 
@@ -432,15 +406,6 @@ function view_all_employees() {
 // ---------------------------------------------------------------
 
 function update_employee_roles_prompt() {
-    // connection.query(`
-    //     SELECT CONCAT(first_name ," " ,last_name)
-    //     FROM employees;`,
-    //     function (err, res) {
-    //         if (err) throw err;
-    //         // Log all results of the SELECT statement
-    //         console.log("\n");
-    //         console.log(res.keys)
-    //     })
     connection.query(`
     SELECT t1.id, CONCAT(t1.first_name ," " ,t1.last_name) AS full_name, t1.manager_id,  t2.title, t2.id AS role_id
     FROM (
@@ -535,7 +500,7 @@ function update_employee_roles_prompt() {
             for (var i = 1; i < res.length; i++) {
                 // print(res[i].title)
                 if (new_role === res[i].title) {
-                    role_id = res[i].id
+                    role_id = res[i].id + 1
                 }
             }
             print(role_id)
@@ -551,21 +516,21 @@ function update_employee_roles_prompt() {
             print(manager_id)
             const new_manager_id = parseInt(manager_id)
 
-            connection.query(`
+            const query = connection.query(`
             UPDATE employees
-            SET role_id = ${new_id}, manager_id = ${new_role_id}
-            WHERE id = ${manager_id};`,
+            SET role_id = ${new_role_id}, manager_id = ${new_manager_id}
+            WHERE id = ${new_id};`,
                 function (err, res) {
-                    // print(id)
-                    // print(role_id)
-                    // print(manager_id)
+                    print(id)
+                    print(role_id)
+                    print(manager_id)
                     if (err) throw err;
                     // Log all results of the SELECT statement
                     console.log("\n");
                     // console.table(res);
                     view_all_employees()
                 })
-                
+                console.log(query.sql);
                 // update_employee_roles()
 
 
@@ -574,20 +539,6 @@ function update_employee_roles_prompt() {
 
     })
 }
-
-// function update_employee_roles() {
-//     connection.query(`
-//         UPDATE employees
-//         SET role_id = ?, manager_id = ?
-//         WHERE id = 10;`,
-//         function (err, res) {
-//             if (err) throw err;
-//             // Log all results of the SELECT statement
-//             console.log("\n");
-//             console.table(res);
-//         })
-//     main_menu_prompt()
-// }
 
 const print = x => console.log(x)
 
@@ -615,70 +566,3 @@ function main_menu_prompt() {
     })
 }
 
-
-
-    // function start_prompt() {
-    //     inquirer.prompt([
-    //         // Ask user to input username
-    //         {
-    //             type: "rawlist",
-    //             name: "navigation",
-    //             message: "What would you like to do",
-    //             choices: [
-    //                 "View All Employees by Department",
-    //                 "View All Employees by Manager",
-    //                 "Add Employee",
-    //                 "Remove Employee",
-    //                 "View All Employees",
-    //                 "Update Employee Roles",
-    //                 "Update Employee Manager",
-    //                 "View All Roles",
-    //                 "Add Roles",
-    //                 "Remove Roles",
-    //             ]).then(function (data) {
-    //                 const navigation = data.navigation
-    //                 if (navigation === 'Add Employee' || navigation === 'Remove Employee') {
-    //                     employee_modificaiton();
-    //                 }
-
-    //             }
-    // }
-
-    // function employee_modificaiton() {
-    //     inquirer.prompt([
-    //         {
-    //             type: "input",
-    //             name: "first_name",
-    //             message: "What is your employees first name?",
-    //         },
-    //         {
-    //             type: "input",
-    //             name: "last_name",
-    //             message: "What is your employees last name?"
-    //         },
-    //         {
-    //             type: "input",
-    //             name: "role",
-    //             message: "What is your employees role?"
-    //         },
-    //         {
-    //             type: "input",
-    //             name: "manager",
-    //             message: "Who is the employee manager?"
-    //         },
-
-
-    //         // Then Once those choices have been made
-    //     ]).then(function (data) {
-    //         // Create a variable with there username combined with a string containing the .pdf extension
-    //         const navigation = data.navigation
-    //         // Assign html string to variable from the generateHTML.js file
-    //         const first_name = data.first_name
-    //         // Assing username to variable
-    //         const last_name = data.last_name;
-    //         // Assing user color to variable
-    //         const role = data.role;
-    //         // Assing user color to variable
-    //         const manager = data.manager;
-
-    //     })
