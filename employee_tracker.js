@@ -98,7 +98,7 @@ function add_departments_prompt() {
         await add_departments(department)
         // await main_menu_prompt()
     })
-    
+
 }
 
 async function add_departments(department) {
@@ -109,8 +109,8 @@ async function add_departments(department) {
             if (err) throw err;
         })
     print("\n<<<Updated Departments>>>")
-        view_all_departments()
-        // main_menu_prompt()
+    view_all_departments()
+    // main_menu_prompt()
 }
 
 // ---------------------------------------------------------------
@@ -118,7 +118,7 @@ async function add_departments(department) {
 // ---------------------------------------------------------------
 
 function add_roles_prompt() {
-    connection.query(`SELECT * FROM departments`,function (err, res) {
+    connection.query(`SELECT * FROM departments`, function (err, res) {
         if (err) throw err;
 
         inquirer.prompt([
@@ -157,7 +157,7 @@ function add_roles_prompt() {
             const department = data.department;
             print(department)
             let department_id = 0;
-            connection.query(`SELECT * FROM departments`,function (err, res) {
+            connection.query(`SELECT * FROM departments`, function (err, res) {
                 if (err) throw err;
                 for (var i = 0; i < res.length; i++) {
                     if (department === res[i].department) {
@@ -165,7 +165,7 @@ function add_roles_prompt() {
                     }
                 }
                 add_roles(role_name, salary, department_id)
-            
+
             })
         })
     })
@@ -191,9 +191,24 @@ function add_roles(role_name, salary, department) {
 // ---------------------------------------------------------------
 
 function add_employee_prompt() {
-    connection.query(`SELECT * FROM roles`,function (err, res) {
+    connection.query(`
+    SELECT t1.id, CONCAT(t1.first_name ," " ,t1.last_name) AS full_name, t2.title, t1.manager_id
+    FROM (
+    SELECT id, first_name, last_name, manager_id,
+            ROW_NUMBER() OVER (ORDER BY first_name) AS rn
+    FROM employees) AS t1
+    LEFT JOIN  (
+    SELECT title,
+            ROW_NUMBER() OVER (ORDER BY title) AS rn
+    FROM roles) AS t2
+    ON t1.rn = t2.rn`, function (err, res) {
         if (err) throw err;
-        
+        // print(res[0].full_name)
+        // print(res[0].title)
+
+        // connection.query(`SELECT * FROM roles`,function (err, res) {
+        //     if (err) throw err;
+
         inquirer.prompt([
             {
                 type: "input",
@@ -207,41 +222,84 @@ function add_employee_prompt() {
             },
             {
                 type: "rawlist",
-                name: "new_role",
+                name: "role",
                 message: "What employees role would you like to change the employee to?",
                 choices: function () {
                     var roles = [];
                     for (var i = 0; i < res.length; i++) {
-                        roles.push(res[i].title)
+                        // print(res[i].title)
+                        let role = res[i].title
+                        if (role !== null) {
+                            roles.push(res[i].title)
+                        }
+
                     }
                     return roles;
                 }
             },
             {
-                type: "input",
+                type: "rawlist",
                 name: "manager",
-                message: "What is the employees manager?"
+                message: "What is your employee manager?",
+                choices: function () {
+                    var managers = [];
+                    for (var i = 0; i < res.length; i++) {
+                        // print(res[i].full_name)
+                        let name = res[i].full_name
+                        let id = res[i].manager_id
+                        if (id === null) {
+                            managers.push(name)
+                        }
+                    }
+                    return managers;
+                }
             },
             // Then Once those choices have been made
-        
+
         ]).then(function (data) {
-            // // Assign html string to variable from the generateHTML.js file
-            // const first_name = data.first_name
-            // print(first_name)
-            // // Assing username to variable
-            // const last_name = data.last_name;
-            // print(last_name)
-            // // Assing user color to variable
-            // const role = data.role;
-            // print(role)
-            // // Assing user color to variable
-            // const manager = data.manager;
-            // print(manager)
-            const first_name = "Jeromy"
-            const last_name = "Back"
-            const role = 4
-            const manager = 1
-            add_employee(first_name, last_name, role, manager)
+            // Assign html string to variable from the generateHTML.js file
+            const first_name = data.first_name
+            print(first_name)
+            // Assing username to variable
+            const last_name = data.last_name;
+            print(last_name)
+            // Assing user color to variable
+            const role = data.role;
+            print(role)
+            // Assing user color to variable
+            const manager = data.manager;
+            print(manager)
+            // const first_name = "Jeromy"
+            // const last_name = "Back"
+            // const role = 4
+            // const manager = 1
+            let role_id = 0;
+            for (var i = 1; i < res.length; i++) {
+                // print(res[i].title)
+                if (role === res[i].title) {
+                    role_id = res[i].id
+                }
+            }
+            let manager_id = 0;
+            for (var i = 1; i < res.length; i++) {
+                // print(res[i].full_name)
+                if (manager === res[i].full_name) {
+                    manager_id = res[i].id
+                }
+            }
+            add_employee(first_name, last_name, role_id, manager_id)
+            // connection.query(`SELECT * FROM roles`, function (err, res) {
+            //     if (err) throw err;
+            //     for (var i = 1; i < res.length; i++) {
+            //         print(res[i].title)
+            //         if (role === res[i].title) {
+            //             role_id = res[i].id
+            //         }
+            //     }
+            //     add_employee(first_name, last_name, role_id, null)
+            // })
+
+
         })
     })
 }
@@ -250,7 +308,7 @@ function add_employee_prompt() {
 async function add_employee(first_name, last_name, role, manager) {
     await connection.query(`
     INSERT INTO employees (first_name, last_name, role_id, manager_id)
-    VALUES ("${first_name}", "${last_name}", "${role}", "${manager}");`,
+    VALUES ("${first_name}", "${last_name}", ${role}, ${manager});`,
         function (err, res) {
             if (err) throw err;
         })
@@ -299,12 +357,12 @@ function get_all_roles() {
         // Log all results of the SELECT statement
         console.log("\n");
         // console.table(res);
-        const values=Object.values(res);
+        const values = Object.values(res);
         // const roles = []
         const roles = map(values => values.title)
         // print(values[0].title)
         print(roles)
-        
+
         // for (let i = 0; i < values.length; i++){
         //     // print(values[i].title)
         //     let role = values[i].title
@@ -313,7 +371,7 @@ function get_all_roles() {
         // }
         // print(roles)
         // return roles
-        
+
     })
     // main_menu_prompt()
 }
@@ -339,7 +397,7 @@ function get_all_roles() {
 //             }
 //             print(roles)
 //             resolve(roles);
-            
+
 //         })
 //     })
 //     // main_menu_prompt()
@@ -387,7 +445,7 @@ function update_employee_roles_prompt() {
     SELECT CONCAT(employees.first_name ," " ,employees.last_name) AS name, roles.title
     FROM employees
     INNER JOIN roles; 
-    `,function (err, res) {
+    `, function (err, res) {
         if (err) throw err;
         inquirer.prompt([
             {
