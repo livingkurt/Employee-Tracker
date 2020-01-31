@@ -411,7 +411,7 @@ function update_employee_roles_prompt() {
             const manager_data = res.find((manager_name) => manager_name.full_name === manager)
             // Gets the manager id associated with that choice
             const manager_id = manager_data.id
-
+            // Update employee in database
             const query = connection.query(`
             UPDATE employees
             SET role_id = ${role_id}, manager_id = ${manager_id}
