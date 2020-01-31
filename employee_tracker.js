@@ -220,14 +220,16 @@ function add_roles(role_name, salary, department) {
 function add_employee_prompt() {
     // Get a of the employees and managers as to use them in an array in the prompts below
     connection.query(`
-    SELECT t1.id, CONCAT(t1.first_name ," " ,t1.last_name) AS full_name, t2.title, t1.manager_id
+    SELECT t1.id, CONCAT(t1.first_name ," " ,t1.last_name) AS full_name, t1.manager_id,  t2.title, t2.id AS role_id
     FROM (
-    SELECT id, first_name, last_name, manager_id, ROW_NUMBER() OVER (ORDER BY first_name) AS rn
+    SELECT id, first_name, last_name, manager_id,
+            ROW_NUMBER() OVER (ORDER BY first_name) AS rn
     FROM employees) AS t1
     LEFT JOIN  (
-    SELECT title, ROW_NUMBER() OVER (ORDER BY title) AS rn
+    SELECT id, title,
+            ROW_NUMBER() OVER (ORDER BY id) AS rn
     FROM roles) AS t2
-    ON t1.rn = t2.rn`, function (err, res) {
+    ON t1.rn = t2.rn;`, function (err, res) {
         // If there is an error throw it
         if (err) throw err;
         // print(res)
@@ -348,16 +350,21 @@ function add_employee_prompt() {
             print(manager)
             
             const employee_data = res.find((role_name) => role_name.title === role)
-            const role_id = employee_data.id - 1
-            print(role_id)
+            const role_id_id = employee_data.role_id
+            print(role_id_id)
 
             // Initialize variable
+            // const manager_data =  res.map(name => name.manager_id ? "" : name.full_name).filter(name => name != "") 
+            // const manager_data = res.find((manager_name) => manager_name.full_name === manager)
+            // const manager_id = manager_data.id
+
             const manager_data = res.find((manager_name) => manager_name.full_name === manager)
+            print(manager_data)
             const manager_id = manager_data.id
 
             print(manager_id)
             // Call the function to place the new employee into database
-            add_employee(first_name, last_name, role_id, manager_id)
+            add_employee(first_name, last_name, role_id_id, manager_id)
 
 
         })
@@ -640,8 +647,8 @@ function update_employee_roles_prompt() {
                     // console.table(res);
                     view_all_employees()
                 })
-            console.log(query.sql);
-            update_employee_roles()
+            // console.log(query.sql);
+            // update_employee_roles()
 
 
         })
