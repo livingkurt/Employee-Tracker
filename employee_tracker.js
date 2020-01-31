@@ -247,22 +247,8 @@ function add_employee_prompt() {
                 name: "role",
                 message: "What employees role would you like to change the employee to?",
                 // Calls an anoynomous function to add the department name column to an array to be used as choices
-                choices: function () {
+                choices: async function () {
                     return res.map(role => role.title)
-                    // Creates empty array
-                    var roles = [];
-                    // Loops through response from database 
-                    for (var i = 0; i < res.length; i++) {
-                        // Create variable with role name
-                        let role = res[i].title
-                        // If the role is not equal to null
-                        if (role !== null) {
-                            // Adds each role name to an array
-                            roles.push(res[i].title)
-                        }
-                    }
-                    // Returns array to be used as an autopopulating list of multiple choices for the question
-                    return roles;
                 }
             },
             {
@@ -270,23 +256,39 @@ function add_employee_prompt() {
                 name: "manager",
                 message: "What is your employee manager?",
                 // Calls an anoynomous function to add the department name column to an array to be used as choices
-                choices: function () {
-                    // Creates empty array
-                    var managers = [];
-                    // Loops through response from database 
-                    for (var i = 0; i < res.length; i++) {
-                        // Create variable with manager name
-                        let name = res[i].full_name
-                        let id = res[i].manager_id
-                        // If the id is equal to null
-                        if (id === null) {
-                            // Adds manager name to an array
-                            managers.push(name)
-                        }
-                    }
-                    // Returns array to be used as an autopopulating list of multiple choices for the question
-                    return managers;
+                choices: async function () {
+                    return res.map(manager_name => manager_name.full_name)
+                    // res.filter((manager_name) => {
+                    //     let id = manager_name.manager_id
+                    //     let name = manager_name.full_name
+                    //     if (id === null) {
+                    //         return name
+                    //     }
+                    // })
+                    // return res.map(manager_name => manager_name.manager_id === null ? manager_name.full_name : print(""))
+                    // return res.map(manager_name => {
+                    //     // let id = role.manager_id
+                    //     // if (id === null) {
+                    //     manager_name.full_name
+                    //     // }
+                    // })
                 }
+                //     // Creates empty array
+                //     var managers = [];
+                //     // Loops through response from database 
+                //     for (var i = 0; i < res.length; i++) {
+                //         // Create variable with manager name
+                //         let name = res[i].full_name
+                //         let id = res[i].manager_id
+                //         // If the id is equal to null
+                //         if (id === null) {
+                //             // Adds manager name to an array
+                //             managers.push(name)
+                //         }
+                //     }
+                //     // Returns array to be used as an autopopulating list of multiple choices for the question
+                //     return managers;
+                // }
             },
             // Then Once those choices have been made
 
@@ -303,26 +305,39 @@ function add_employee_prompt() {
             // Assing manager to variable
             const manager = data.manager;
             print(manager)
+        // }).then(function (res) {
+            
+            const employee_data = res.find((role_name) => role_name.title === role)
+            const role_id = employee_data.id - 1
+            print(role_id)
+            // return res
+        // }).then(function () {
+
+            
             // Initialize variable
-            let role_id = 0;
+            // let role_id = 0;
             // Loops through response from database 
-            for (var i = 1; i < res.length; i++) {
-                // If role name chosen by user matches the role name in database
-                if (role === res[i].title) {
-                    // Assign the id associated with that role to the variable
-                    role_id = res[i].id
-                }
-            }
+            // for (var i = 1; i < res.length; i++) {
+            //     // If role name chosen by user matches the role name in database
+            //     if (role === res[i].title) {
+            //         // Assign the id associated with that role to the variable
+            //         role_id = res[i].id + 1
+            //     }
+            // }
+            
             // Initialize variable
-            let manager_id = 0;
-            // Loops through response from database 
-            for (var i = 1; i < res.length; i++) {
-                // If manager name chosen by user matches any employee name in database
-                if (manager === res[i].full_name) {
-                    // Assign the manager id associated with that role to the variable
-                    manager_id = res[i].id
-                }
-            }
+            const manager_data = res.find((manager_name) => manager_name.full_name === manager)
+            const manager_id = manager_data.id
+            // let manager_id = 0;
+            // // Loops through response from database 
+            // for (var i = 1; i < res.length; i++) {
+            //     // If manager name chosen by user matches any employee name in database
+            //     if (manager === res[i].full_name) {
+            //         // Assign the manager id associated with that role to the variable
+            //         manager_id = res[i].id + 1
+            //     }
+            // }
+            print(manager_id)
             // Call the function to place the new employee into database
             add_employee(first_name, last_name, role_id, manager_id)
 
@@ -330,6 +345,8 @@ function add_employee_prompt() {
         })
     })
 }
+
+
 
 
 function add_employee(first_name, last_name, role, manager) {
@@ -462,7 +479,7 @@ function update_employee_roles_prompt() {
                 choices: function () {
                     // Creates empty array
                     var employee_name = [];
-                     // Loops through response from database 
+                    // Loops through response from database 
                     for (var i = 0; i < res.length; i++) {
                         // Create variable with name
                         let name = res[i].full_name
@@ -485,7 +502,7 @@ function update_employee_roles_prompt() {
                 choices: function () {
                     // Creates empty array
                     var roles = [];
-                     // Loops through response from database 
+                    // Loops through response from database 
                     for (var i = 0; i < res.length; i++) {
                         // Create variable with manager name
                         let role = res[i].title
@@ -508,7 +525,7 @@ function update_employee_roles_prompt() {
                 choices: function () {
                     // Creates empty array
                     var managers = [];
-                     // Loops through response from database 
+                    // Loops through response from database 
                     for (var i = 0; i < res.length; i++) {
                         // Create variable with manager name
                         let manager_name = res[i].full_name
