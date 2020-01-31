@@ -34,13 +34,13 @@ The ability to search through the database add and edit
 * First copy and paste schema.sql into MySQL workbench and run it
 * Next run the employee_tracker.js in your terminal, making sure to be in the correct directory
 * You will be offered a list of options shown below
-    * Add Departments,
-    * Add Roles,
-    * Add Employee,
-    * View All Departments,
-    * View All Roles,
-    * View All Employees,
-    * Update Employee Roles,
+    * Add Departments
+    * Add Roles
+    * Add Employee
+    * View All Departments
+    * View All Roles
+    * View All Employees
+    * Update Employee Roles
     * Exit
 * In each menu you will be shown a variety of options that will give you access to the employee, role, and department data
 
