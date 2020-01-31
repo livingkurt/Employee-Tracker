@@ -2,15 +2,6 @@
 const inquirer = require("inquirer");
 const mysql = require("mysql");
 
-// const add_departments_js = require("./assets/departments/add_departments");
-// const view_departments_js = require("./assets/departments/view_departments");
-// const add_employees_js = require("./assets/employees/add_employees.js");
-// const view_employees_js = require("./assets/employees/view_employees.js");
-// const update_employees_js = require("./assets/employees/update_employees.js");
-// const add_roles_js = require("./assets/roles/add_roles.js");
-// const view_roles_js = require("./assets/departments/view_roles.js");
-
-
 // Create the connection information for the sql database
 var connection = mysql.createConnection({
     // Set what the url will be
@@ -37,7 +28,6 @@ connection.connect(function (err) {
 // ---------------------------------------------------------------
 // Main Menu
 // ---------------------------------------------------------------
-
 
 // Initiate terminal based user interface
 function start_prompt() {
@@ -88,14 +78,11 @@ function start_prompt() {
                 // update_employee_roles_prompt()
                 print("\n<<<Exiting Database\n")
                 break;
-
             default:
                 break;
         }
     })
 }
-
-
 // ---------------------------------------------------------------
 // Adding a new departments √
 // ---------------------------------------------------------------
@@ -160,10 +147,8 @@ function add_roles_prompt() {
                 type: "rawlist",
                 name: "department",
                 message: "What department is it in?",
-                // Calls an anoynomous function to add the department name column to an array to be used as choices
-                choices: function () {
-                    return res.map(depart => depart.department)
-                }
+                // Creates an array from the response from the departments table
+                choices: res.map(depart => depart.department)
             },
             // Then Once those choices have been made
         ]).then(function (data) {
@@ -232,7 +217,6 @@ function add_employee_prompt() {
     ON t1.rn = t2.rn;`, function (err, res) {
         // If there is an error throw it
         if (err) throw err;
-        // print(res)
         // Asks user information about new employee
         inquirer.prompt([
             {
@@ -249,124 +233,36 @@ function add_employee_prompt() {
                 type: "rawlist",
                 name: "role",
                 message: "What employees role would you like to change the employee to?",
-                // Calls an anoynomous function to add the department name column to an array to be used as choices
-                choices: res.map(role => role.title ? role.title : "").filter(title => title != "") //function () {
-                // choices: res.map(role => role.title) //function () {
-                    // return res.map(role => role.title)
-                //     // Creates empty array
-                //     var roles = [];
-                //     // Loops through response from database 
-                //     for (var i = 0; i < res.length; i++) {
-                //         // Create variable with manager name
-                //         let role = res[i].title
-                //         // If the role is not equal to null
-                //         if (role !== null) {
-                //             // Adds manager name to an array
-                //             roles.push(role)
-                //         }
-
-                //     }
-                //     // Returns array to be used as an autopopulating list of multiple choices for the question
-                //     return roles;
-                // }
+                // Creates an array from the response from the roles table, removes the null and filters out the empty string so that just roles show up
+                choices: res.map(role => role.title ? role.title : "").filter(title => title != "")
             },
-            //     choices: async function () {
-            //         return res.map(role => role.title)
-            //     }
-
-            // },
             {
                 type: "rawlist",
                 name: "manager",
                 message: "What is your employee manager?",
-                choices: res.map(name => name.manager_id ? "" : name.full_name).filter(name => name != "") //function () {
-                //     // return res.map(manager_name => manager_name.full_name)
-                //     // Creates empty array
-                //     var managers = [];
-                //     // Loops through response from database 
-                //     for (var i = 0; i < res.length; i++) {
-                //         // Create variable with manager name
-                //         let manager_name = res[i].full_name
-                //         let id = res[i].manager_id
-                //         // If the id is equal to null
-                //         if (id === null) {
-                //             // Adds manager name to an array
-                //             managers.push(manager_name)
-                //         }
-                //     }
-                //     // Returns array to be used as an autopopulating list of multiple choices for the question
-                //     return managers;
-                // }
+                // Creates an array from the response from the roles table, removes the null and filters out the empty string so that just managers show up and not employees
+                choices: res.map(name => name.manager_id ? "" : name.full_name).filter(name => name != "")
             },
-                // Calls an anoynomous function to add the department name column to an array to be used as choices
-                // choices: async function () {
-                //     return res.map(manager_name => manager_name.full_name)
-                    // res.filter((manager_name) => {
-                    //     let id = manager_name.manager_id
-                    //     let name = manager_name.full_name
-                    //     if (id === null) {
-                    //         return name
-                    //     }
-                    // })
-                    // return res.map(manager_name => manager_name.manager_id === null ? manager_name.full_name : print(""))
-                    // return res.map(manager_name => {
-                    //     // let id = role.manager_id
-                    //     // if (id === null) {
-                    //     manager_name.full_name
-                    //     // }
-                    // })
-                // }
-                //     // Creates empty array
-                //     var managers = [];
-                //     // Loops through response from database 
-                //     for (var i = 0; i < res.length; i++) {
-                //         // Create variable with manager name
-                //         let name = res[i].full_name
-                //         let id = res[i].manager_id
-                //         // If the id is equal to null
-                //         if (id === null) {
-                //             // Adds manager name to an array
-                //             managers.push(name)
-                //         }
-                //     }
-                //     // Returns array to be used as an autopopulating list of multiple choices for the question
-                //     return managers;
-                // }
-            // },
-            // Then Once those choices have been made
 
         ]).then(function (data) {
             // Assign first_name to variable 
             const first_name = data.first_name
-            print(first_name)
             // Assing last_name to variable
             const last_name = data.last_name;
-            print(last_name)
             // Assing role to variable
             const role = data.role;
-            print(role)
             // Assing manager to variable
             const manager = data.manager;
-            print(manager)
-            
+            // Searches inside of response for a role title that matches the user choice
             const employee_data = res.find((role_name) => role_name.title === role)
+            // Gets the role id associated with that choice
             const role_id_id = employee_data.role_id
-            print(role_id_id)
-
-            // Initialize variable
-            // const manager_data =  res.map(name => name.manager_id ? "" : name.full_name).filter(name => name != "") 
-            // const manager_data = res.find((manager_name) => manager_name.full_name === manager)
-            // const manager_id = manager_data.id
-
+            // Searches inside of response for a manager name that matches the user choice
             const manager_data = res.find((manager_name) => manager_name.full_name === manager)
-            print(manager_data)
+            // Gets the manager id associated with that choice
             const manager_id = manager_data.id
-
-            print(manager_id)
             // Call the function to place the new employee into database
             add_employee(first_name, last_name, role_id_id, manager_id)
-
-
         })
     })
 }
@@ -473,213 +369,60 @@ function update_employee_roles_prompt() {
                 type: "rawlist",
                 name: "name",
                 message: "Which employee do you want to update?",
-                // Calls an anoynomous function to add the department name column to an array to be used as choices
-                // choices: res.map(employee_name => employee_name.full_name) //function () {
-                    // return res.map(employee_name => employee_name.full_name)
-                    // Creates empty array
-                //     var employee_name = [];
-                //     // Loops through response from database 
-                //     for (var i = 0; i < res.length; i++) {
-                //         // Create variable with name
-                //         let name = res[i].full_name
-                //         // If the name is not equal to null
-                //         if (name !== null) {
-                //             // let name = res[i].full_name
-                //             // Adds employee name to an array
-                //             employee_name.push(name)
-                //         }
-                //     }
-                //     // Returns array to be used as an autopopulating list of multiple choices for the question
-                //     return employee_name;
-                // }
-                choices: res.map(name => name.manager_id ? name.full_name : "").filter(name => name != "") //function () {
-                //     // return res.map(manager_name => manager_name.full_name)
-                //     return res.map(name => name.full_name ? name.full_name : "").filter(name => name != "")
-                //     // Creates empty array
-                //     var employee_name = [];
-                //     // Loops through response from database 
-                //     for (var i = 0; i < res.length; i++) {
-                //         // Create variable with manager name
-                //         let name = res[i].full_name
-                //         let id = res[i].manager_id
-                //         // If the id is equal to null
-                //         if (id != null) {
-                //             // Adds manager name to an array
-                //             employee_name.push(name)
-                //         }
-                //     }
-                //     // Returns array to be used as an autopopulating list of multiple choices for the question
-                //     return employee_name;
-                // }
-            // },
+                // Creates an array from the response from the roles table, removes the null and filters out the empty string so that just employees show up and not managers
+                choices: res.map(name => name.manager_id ? name.full_name : "").filter(name => name != "")
             },
             {
                 type: "rawlist",
                 name: "new_role",
                 message: "What employee role would you like to change the employee to?",
-                // Calls an anoynomous function to add the department name column to an array to be used as choices
+                // Creates an array from the response from the roles table, removes the null and filters out the empty string so that just roles show up
                 choices: res.map(role => role.title ? role.title : "").filter(title => title != "")
-                // choices: function () {
-                //     return res.map(role => role.title)
-                    // Creates empty array
-                //     var roles = [];
-                //     // Loops through response from database 
-                //     for (var i = 0; i < res.length; i++) {
-                //         // Create variable with manager name
-                //         let role = res[i].title
-                //         // If the role is not equal to null
-                //         if (role !== null) {
-                //             // Adds manager name to an array
-                //             roles.push(role)
-                //         }
-
-                //     }
-                //     // Returns array to be used as an autopopulating list of multiple choices for the question
-                //     return roles;
-                // }
-                
             },
             {
                 type: "rawlist",
                 name: "manager",
                 message: "Choose Manager for employee to be under?",
-                // Calls an anoynomous function to add the department name column to an array to be used as choices
-                // choices: res.map(manager_name => manager_name.full_name) //function () {
+                // Creates an array from the response from the roles table, removes the null and filters out the empty string so that just managers show up and not employees
                 choices: res.map(name => name.manager_id ? "" : name.full_name).filter(name => name != "")
-                // choices: function () {
-                //     // return res.map(manager_name => manager_name.full_name)
-                //     // Creates empty array
-                //     var managers = [];
-                //     // Loops through response from database 
-                //     for (var i = 0; i < res.length; i++) {
-                //         // Create variable with manager name
-                //         let manager_name = res[i].full_name
-                //         let id = res[i].manager_id
-                //         // If the id is equal to null
-                //         if (id === null) {
-                //             // Adds manager name to an array
-                //             managers.push(manager_name)
-                //         }
-                //     }
-                //     // Returns array to be used as an autopopulating list of multiple choices for the question
-                //     return managers;
-                // }
             },
             // Then Once those choices have been made
         ]).then(function (data) {
             // Assign html string to variable from the generateHTML.js file
             const name = data.name
-            print(name)
             // Assing user color to variable
             const new_role = data.new_role;
-            print(new_role)
-
             // Assing user color to variable
             const manager = data.manager;
-            print(manager)
+            // Searches inside of response for a manager name that matches the user choice
             const employee_data = res.find((employee_name) => employee_name.full_name === name)
+            // Gets the employee id associated with that choice
             const id = employee_data.id
-            print(id)
-            // let id = 0;
-            // for (var i = 1; i < res.length; i++) {
-            //     let name = res[i].full_name
-            //     if (name === res[i].full_name) {
-            //         // print(res[i].full_name)
-            //         id = res[i].id
-
-            //     }
-
-            // }
-            
-            // const new_id = parseInt(id)
-
+            // Searches inside of response for a role title that matches the user choice
             const role_data = res.find((role_name) => {
-                // print(role_name.title)
-                if (role_name.title === new_role){
+                // if the role title = the chosen title
+                if (role_name.title === new_role) {
+                    // Return the role id associated with it
                     return role_name.role_id
                 }
             })
-            print(role_data)
             const role_id = role_data.role_id
-            print(role_id)
-            // // const role_id = role_data.id + 1
-            // print(role_data)
-            // print(role_id)
-
-            // let role_id = 0;
-            // for (var i = 1; i < res.length; i++) {
-            //     // print(res[i].title)
-            //     // print(new_role)
-            //     // print(res[i].role_id)
-            //     if (new_role === res[i].title) {
-            //         role_id = res[i].role_id
-            //         print(role_id)
-            //     }
-            // }
-            // print(role_id)
-            // const new_role_id = parseInt(role_id)
-
-            // let manager_id = 0;
-            // for (var i = 1; i < res.length; i++) {
-            //     // print(res[i].full_name)
-            //     if (manager === res[i].full_name) {
-            //         manager_id = res[i].id
-            //     }
-            // }
-            // Initialize variable
+            // Searches inside of response for a manager name that matches the user choice
             const manager_data = res.find((manager_name) => manager_name.full_name === manager)
+            // Gets the manager id associated with that choice
             const manager_id = manager_data.id
-            // print(manager_data)
-            print(manager_id)
-            // const new_manager_id = parseInt(manager_id)
 
             const query = connection.query(`
             UPDATE employees
             SET role_id = ${role_id}, manager_id = ${manager_id}
             WHERE id = ${id};`,
                 function (err, res) {
-                    // print(id)
-                    // print(role_id)
-                    // print(manager_id)
                     if (err) throw err;
-                    // Log all results of the SELECT statement
-                    // console.log("\n");
-                    // console.table(res);
                     view_all_employees()
                 })
-            // console.log(query.sql);
-            // update_employee_roles()
-
-
         })
-
-
     })
 }
 
 const print = x => console.log(x)
-
-
-
-
-// Deciding whether to start over or not
-
-function main_menu_prompt() {
-    inquirer.prompt([
-        {
-            type: "confirm",
-            name: "menu",
-            message: "Back to main menu?",
-        },
-    ]).then(function (data) {
-        const menu = data.menu;
-        print(menu)
-        if (menu) {
-            start_prompt()
-        }
-        else {
-            connection.end();
-        }
-    })
-}
 
