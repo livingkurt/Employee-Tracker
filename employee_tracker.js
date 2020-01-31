@@ -230,6 +230,7 @@ function add_employee_prompt() {
     ON t1.rn = t2.rn`, function (err, res) {
         // If there is an error throw it
         if (err) throw err;
+        // print(res)
         // Asks user information about new employee
         inquirer.prompt([
             {
@@ -247,17 +248,57 @@ function add_employee_prompt() {
                 name: "role",
                 message: "What employees role would you like to change the employee to?",
                 // Calls an anoynomous function to add the department name column to an array to be used as choices
-                choices: async function () {
-                    return res.map(role => role.title)
-                }
+                choices: res.map(role => role.title ? role.title : "").filter(title => title != "") //function () {
+                // choices: res.map(role => role.title) //function () {
+                    // return res.map(role => role.title)
+                //     // Creates empty array
+                //     var roles = [];
+                //     // Loops through response from database 
+                //     for (var i = 0; i < res.length; i++) {
+                //         // Create variable with manager name
+                //         let role = res[i].title
+                //         // If the role is not equal to null
+                //         if (role !== null) {
+                //             // Adds manager name to an array
+                //             roles.push(role)
+                //         }
+
+                //     }
+                //     // Returns array to be used as an autopopulating list of multiple choices for the question
+                //     return roles;
+                // }
             },
+            //     choices: async function () {
+            //         return res.map(role => role.title)
+            //     }
+
+            // },
             {
                 type: "rawlist",
                 name: "manager",
                 message: "What is your employee manager?",
+                choices: res.map(name => name.manager_id ? "" : name.full_name).filter(name => name != "") //function () {
+                //     // return res.map(manager_name => manager_name.full_name)
+                //     // Creates empty array
+                //     var managers = [];
+                //     // Loops through response from database 
+                //     for (var i = 0; i < res.length; i++) {
+                //         // Create variable with manager name
+                //         let manager_name = res[i].full_name
+                //         let id = res[i].manager_id
+                //         // If the id is equal to null
+                //         if (id === null) {
+                //             // Adds manager name to an array
+                //             managers.push(manager_name)
+                //         }
+                //     }
+                //     // Returns array to be used as an autopopulating list of multiple choices for the question
+                //     return managers;
+                // }
+            },
                 // Calls an anoynomous function to add the department name column to an array to be used as choices
-                choices: async function () {
-                    return res.map(manager_name => manager_name.full_name)
+                // choices: async function () {
+                //     return res.map(manager_name => manager_name.full_name)
                     // res.filter((manager_name) => {
                     //     let id = manager_name.manager_id
                     //     let name = manager_name.full_name
@@ -272,7 +313,7 @@ function add_employee_prompt() {
                     //     manager_name.full_name
                     //     // }
                     // })
-                }
+                // }
                 //     // Creates empty array
                 //     var managers = [];
                 //     // Loops through response from database 
@@ -289,7 +330,7 @@ function add_employee_prompt() {
                 //     // Returns array to be used as an autopopulating list of multiple choices for the question
                 //     return managers;
                 // }
-            },
+            // },
             // Then Once those choices have been made
 
         ]).then(function (data) {
@@ -305,38 +346,15 @@ function add_employee_prompt() {
             // Assing manager to variable
             const manager = data.manager;
             print(manager)
-        // }).then(function (res) {
             
             const employee_data = res.find((role_name) => role_name.title === role)
             const role_id = employee_data.id - 1
             print(role_id)
-            // return res
-        // }).then(function () {
 
-            
-            // Initialize variable
-            // let role_id = 0;
-            // Loops through response from database 
-            // for (var i = 1; i < res.length; i++) {
-            //     // If role name chosen by user matches the role name in database
-            //     if (role === res[i].title) {
-            //         // Assign the id associated with that role to the variable
-            //         role_id = res[i].id + 1
-            //     }
-            // }
-            
             // Initialize variable
             const manager_data = res.find((manager_name) => manager_name.full_name === manager)
             const manager_id = manager_data.id
-            // let manager_id = 0;
-            // // Loops through response from database 
-            // for (var i = 1; i < res.length; i++) {
-            //     // If manager name chosen by user matches any employee name in database
-            //     if (manager === res[i].full_name) {
-            //         // Assign the manager id associated with that role to the variable
-            //         manager_id = res[i].id + 1
-            //     }
-            // }
+
             print(manager_id)
             // Call the function to place the new employee into database
             add_employee(first_name, last_name, role_id, manager_id)
@@ -401,33 +419,6 @@ function view_all_roles() {
     start_prompt()
 }
 
-// function get_all_roles() {
-//     connection.query("SELECT * FROM roles", function (err, res) {
-//         if (err) throw err;
-//         // Log all results of the SELECT statement
-//         console.log("\n");
-//         // console.table(res);
-//         const values = Object.values(res);
-//         // const roles = []
-//         const roles = map(values => values.title)
-//         // print(values[0].title)
-//         print(roles)
-
-//         // for (let i = 0; i < values.length; i++){
-//         //     // print(values[i].title)
-//         //     let role = values[i].title
-//         //     roles.push(role)
-//         //     // print(roles)
-//         // }
-//         // print(roles)
-//         // return roles
-
-//     })
-//     start_prompt()
-//     // main_menu_prompt()
-// }
-
-
 // ---------------------------------------------------------------
 // Viewing all Employees
 // ---------------------------------------------------------------
@@ -476,69 +467,96 @@ function update_employee_roles_prompt() {
                 name: "name",
                 message: "Which employee do you want to update?",
                 // Calls an anoynomous function to add the department name column to an array to be used as choices
-                choices: function () {
+                // choices: res.map(employee_name => employee_name.full_name) //function () {
+                    // return res.map(employee_name => employee_name.full_name)
                     // Creates empty array
-                    var employee_name = [];
-                    // Loops through response from database 
-                    for (var i = 0; i < res.length; i++) {
-                        // Create variable with name
-                        let name = res[i].full_name
-                        // If the name is not equal to null
-                        if (name !== null) {
-                            // let name = res[i].full_name
-                            // Adds employee name to an array
-                            employee_name.push(name)
-                        }
-                    }
-                    // Returns array to be used as an autopopulating list of multiple choices for the question
-                    return employee_name;
-                }
+                //     var employee_name = [];
+                //     // Loops through response from database 
+                //     for (var i = 0; i < res.length; i++) {
+                //         // Create variable with name
+                //         let name = res[i].full_name
+                //         // If the name is not equal to null
+                //         if (name !== null) {
+                //             // let name = res[i].full_name
+                //             // Adds employee name to an array
+                //             employee_name.push(name)
+                //         }
+                //     }
+                //     // Returns array to be used as an autopopulating list of multiple choices for the question
+                //     return employee_name;
+                // }
+                choices: res.map(name => name.manager_id ? name.full_name : "").filter(name => name != "") //function () {
+                //     // return res.map(manager_name => manager_name.full_name)
+                //     return res.map(name => name.full_name ? name.full_name : "").filter(name => name != "")
+                //     // Creates empty array
+                //     var employee_name = [];
+                //     // Loops through response from database 
+                //     for (var i = 0; i < res.length; i++) {
+                //         // Create variable with manager name
+                //         let name = res[i].full_name
+                //         let id = res[i].manager_id
+                //         // If the id is equal to null
+                //         if (id != null) {
+                //             // Adds manager name to an array
+                //             employee_name.push(name)
+                //         }
+                //     }
+                //     // Returns array to be used as an autopopulating list of multiple choices for the question
+                //     return employee_name;
+                // }
+            // },
             },
             {
                 type: "rawlist",
                 name: "new_role",
                 message: "What employee role would you like to change the employee to?",
                 // Calls an anoynomous function to add the department name column to an array to be used as choices
-                choices: function () {
+                choices: res.map(role => role.title ? role.title : "").filter(title => title != "")
+                // choices: function () {
+                //     return res.map(role => role.title)
                     // Creates empty array
-                    var roles = [];
-                    // Loops through response from database 
-                    for (var i = 0; i < res.length; i++) {
-                        // Create variable with manager name
-                        let role = res[i].title
-                        // If the role is not equal to null
-                        if (role !== null) {
-                            // Adds manager name to an array
-                            roles.push(role)
-                        }
+                //     var roles = [];
+                //     // Loops through response from database 
+                //     for (var i = 0; i < res.length; i++) {
+                //         // Create variable with manager name
+                //         let role = res[i].title
+                //         // If the role is not equal to null
+                //         if (role !== null) {
+                //             // Adds manager name to an array
+                //             roles.push(role)
+                //         }
 
-                    }
-                    // Returns array to be used as an autopopulating list of multiple choices for the question
-                    return roles;
-                }
+                //     }
+                //     // Returns array to be used as an autopopulating list of multiple choices for the question
+                //     return roles;
+                // }
+                
             },
             {
                 type: "rawlist",
                 name: "manager",
                 message: "Choose Manager for employee to be under?",
                 // Calls an anoynomous function to add the department name column to an array to be used as choices
-                choices: function () {
-                    // Creates empty array
-                    var managers = [];
-                    // Loops through response from database 
-                    for (var i = 0; i < res.length; i++) {
-                        // Create variable with manager name
-                        let manager_name = res[i].full_name
-                        let id = res[i].manager_id
-                        // If the id is equal to null
-                        if (id === null) {
-                            // Adds manager name to an array
-                            managers.push(manager_name)
-                        }
-                    }
-                    // Returns array to be used as an autopopulating list of multiple choices for the question
-                    return managers;
-                }
+                // choices: res.map(manager_name => manager_name.full_name) //function () {
+                choices: res.map(name => name.manager_id ? "" : name.full_name).filter(name => name != "")
+                // choices: function () {
+                //     // return res.map(manager_name => manager_name.full_name)
+                //     // Creates empty array
+                //     var managers = [];
+                //     // Loops through response from database 
+                //     for (var i = 0; i < res.length; i++) {
+                //         // Create variable with manager name
+                //         let manager_name = res[i].full_name
+                //         let id = res[i].manager_id
+                //         // If the id is equal to null
+                //         if (id === null) {
+                //             // Adds manager name to an array
+                //             managers.push(manager_name)
+                //         }
+                //     }
+                //     // Returns array to be used as an autopopulating list of multiple choices for the question
+                //     return managers;
+                // }
             },
             // Then Once those choices have been made
         ]).then(function (data) {
@@ -552,60 +570,82 @@ function update_employee_roles_prompt() {
             // Assing user color to variable
             const manager = data.manager;
             print(manager)
-
-            let id = 0;
-            for (var i = 1; i < res.length; i++) {
-                let name = res[i].full_name
-                if (name === res[i].full_name) {
-                    // print(res[i].full_name)
-                    id = res[i].id
-
-                }
-
-            }
+            const employee_data = res.find((employee_name) => employee_name.full_name === name)
+            const id = employee_data.id
             print(id)
-            const new_id = parseInt(id)
+            // let id = 0;
+            // for (var i = 1; i < res.length; i++) {
+            //     let name = res[i].full_name
+            //     if (name === res[i].full_name) {
+            //         // print(res[i].full_name)
+            //         id = res[i].id
 
-            let role_id = 0;
-            for (var i = 1; i < res.length; i++) {
-                // print(res[i].title)
-                if (new_role === res[i].title) {
-                    role_id = res[i].id + 1
+            //     }
+
+            // }
+            
+            // const new_id = parseInt(id)
+
+            const role_data = res.find((role_name) => {
+                // print(role_name.title)
+                if (role_name.title === new_role){
+                    return role_name.role_id
                 }
-            }
+            })
+            print(role_data)
+            const role_id = role_data.role_id
             print(role_id)
-            const new_role_id = parseInt(role_id)
+            // // const role_id = role_data.id + 1
+            // print(role_data)
+            // print(role_id)
 
-            let manager_id = 0;
-            for (var i = 1; i < res.length; i++) {
-                // print(res[i].full_name)
-                if (manager === res[i].full_name) {
-                    manager_id = res[i].id
-                }
-            }
+            // let role_id = 0;
+            // for (var i = 1; i < res.length; i++) {
+            //     // print(res[i].title)
+            //     // print(new_role)
+            //     // print(res[i].role_id)
+            //     if (new_role === res[i].title) {
+            //         role_id = res[i].role_id
+            //         print(role_id)
+            //     }
+            // }
+            // print(role_id)
+            // const new_role_id = parseInt(role_id)
+
+            // let manager_id = 0;
+            // for (var i = 1; i < res.length; i++) {
+            //     // print(res[i].full_name)
+            //     if (manager === res[i].full_name) {
+            //         manager_id = res[i].id
+            //     }
+            // }
+            // Initialize variable
+            const manager_data = res.find((manager_name) => manager_name.full_name === manager)
+            const manager_id = manager_data.id
+            // print(manager_data)
             print(manager_id)
-            const new_manager_id = parseInt(manager_id)
+            // const new_manager_id = parseInt(manager_id)
 
             const query = connection.query(`
             UPDATE employees
-            SET role_id = ${new_role_id}, manager_id = ${new_manager_id}
-            WHERE id = ${new_id};`,
+            SET role_id = ${role_id}, manager_id = ${manager_id}
+            WHERE id = ${id};`,
                 function (err, res) {
-                    print(id)
-                    print(role_id)
-                    print(manager_id)
+                    // print(id)
+                    // print(role_id)
+                    // print(manager_id)
                     if (err) throw err;
                     // Log all results of the SELECT statement
-                    console.log("\n");
+                    // console.log("\n");
                     // console.table(res);
                     view_all_employees()
                 })
             console.log(query.sql);
-            // update_employee_roles()
+            update_employee_roles()
 
 
         })
-        // main_menu_prompt()
+
 
     })
 }
